@@ -1,6 +1,8 @@
 
 Memory myMem;
 Hexview myHexview;
+CPU cpu1;
+Assembler myAssembler;
 
 int keyIdx = 0;
 
@@ -9,8 +11,9 @@ void setup()
   size(800, 600);
   frameRate(24);
 
-  myMem = new Memory(512);
-
+  myMem = new Memory(128);
+  cpu1 = new CPU(myMem, 0);
+  myAssembler = new Assembler();
   myHexview = new Hexview(myMem);
 }
 
@@ -18,16 +21,20 @@ void draw()
 {
   myHexview.clearHilights();
   background(0);
-  
-  if (random(1000) < 5) {
-    scale(1.05);
-  }
-  
-  myHexview.setHilight(keyIdx, 1);
-  myHexview.draw();
-  
 
-  
+  int pc = cpu1.pc;
+  myHexview.setHilight(keyIdx, 1);
+  myHexview.setHilight(myMem.lastWriteAddr, 8);
+  myHexview.setHilight(pc, 4);
+  text(myAssembler.dis(myMem.get(pc), myMem.get(pc + 1)), 10, 20);
+  pushMatrix();
+  translate(200, 20);
+  myHexview.draw();
+  popMatrix();
+  pushMatrix();
+  translate(0, 600);
+  cpu1.display();
+  popMatrix();
 }
 
 void keyPressed() {
@@ -42,13 +49,15 @@ void keyPressed() {
       myMem.set(keyIdx, (byte)(myMem.get(keyIdx) + 1));
     }
     if (keyCode == DOWN) {
-      myMem.set(keyIdx, (byte)(myMem.get(keyIdx) - 1));  
+      myMem.set(keyIdx, (byte)(myMem.get(keyIdx) - 1));
+    }
+    if (keyCode == SHIFT) {
+      cpu1.tick();
     }
   }
-  
-  if (keyIdx < 0) {
-    keyIdx = 0;
+
+  if (keyIdx == -1) {
+    keyIdx = myMem.getSize();
   }
 }
-
 
