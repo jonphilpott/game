@@ -1,0 +1,3 @@
+interface Tickable {
+  void tick();
+}

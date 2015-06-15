@@ -1,4 +1,4 @@
-class Memory {
+class Memory extends Eventable {
   byte[] mem;
   int   size;
   int   lastWriteAddr = 0;
@@ -9,6 +9,7 @@ class Memory {
     for (int i = 0; i < s; i++) {
       mem[i] = (byte) i;
     }
+    this.evSetup(1);
   }
 
   byte get(int addr) {
